@@ -11,4 +11,5 @@ from minlora.utils import (
     select_lora,
     tie_weights,
     untie_weights,
+    create_lora_config,
 )

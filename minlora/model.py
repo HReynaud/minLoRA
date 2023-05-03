@@ -98,3 +98,26 @@ def merge_lora(model):
 def remove_lora(model):
     """remove lora parametrization to all layers in a model. This will remove all parametrization"""
     model.apply(partial(apply_lora, register=False, merge=False))
+
+def create_lora_config(rank=4, dropout=0.0, alpha=1, layers=None):
+    default_dict = {
+        nn.Linear: {
+            "weight": partial(LoRAParametrization.from_linear, rank=4),
+        },
+        nn.Conv2d: {
+            "weight": partial(LoRAParametrization.from_conv2d, rank=4),
+        },
+        nn.Conv3d: {
+            "weight": partial(LoRAParametrization.from_conv2d, rank=4),
+        },
+    }
+    if layers is None:
+        return default_dict
+    else:
+        output_dict = {}
+        for layer in layers:
+            if layer in default_dict:
+                output_dict[layer] = default_dict[layer]
+            else:
+                raise NotImplementedError(f"LoRA is not implemented for layer {layer.__class__.__name__}")
+    return output_dict
